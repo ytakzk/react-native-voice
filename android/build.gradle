@@ -79,5 +79,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:hermes-android")
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
