@@ -1,5 +1,4 @@
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
-import invariant from 'invariant';
 import {
   VoiceModule,
   SpeechEvents,
@@ -15,7 +14,7 @@ const Voice = NativeModules.Voice as VoiceModule;
 
 // NativeEventEmitter is only availabe on React Native platforms, so this conditional is used to avoid import conflicts in the browser/server
 const voiceEmitter =
-  Platform.OS !== 'web' ? new NativeEventEmitter(Voice) : null;
+  Platform.OS !== 'web' ? new NativeEventEmitter(Voice as any) : null;
 type SpeechEvent = keyof SpeechEvents;
 
 class RCTVoice {
@@ -60,7 +59,7 @@ class RCTVoice {
             this._listeners.map(listener => listener.remove());
             this._listeners = null;
           }
-          resolve();
+          resolve(undefined);
         }
       });
     });
@@ -78,7 +77,7 @@ class RCTVoice {
         if (error) {
           reject(new Error(error));
         } else {
-          resolve();
+          resolve(null);
         }
       };
       if (Platform.OS === 'android') {
@@ -109,7 +108,7 @@ class RCTVoice {
         if (error) {
           reject(new Error(error));
         } else {
-          resolve();
+          resolve(undefined);
         }
       });
     });
@@ -123,7 +122,7 @@ class RCTVoice {
         if (error) {
           reject(new Error(error));
         } else {
-          resolve();
+          resolve(undefined);
         }
       });
     });
@@ -145,10 +144,6 @@ class RCTVoice {
    * */
   getSpeechRecognitionServices() {
     if (Platform.OS !== 'android') {
-      invariant(
-        Voice,
-        'Speech recognition services can be queried for only on Android',
-      );
       return;
     }
 

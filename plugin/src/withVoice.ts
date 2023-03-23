@@ -2,6 +2,7 @@ import {
   AndroidConfig,
   ConfigPlugin,
   createRunOncePlugin,
+  withAndroidManifest,
   withInfoPlist,
 } from '@expo/config-plugins';
 
@@ -62,12 +63,35 @@ const withAndroidPermissions: ConfigPlugin = config => {
   ]);
 };
 
+const androidVoiceRecognitionIntent = {
+  'intent': {
+    'action': {
+      $: {
+        'android:name': "android.speech.RecognitionService",
+      },
+    },
+  }
+}
+
+const withAndroidManifestFixForAndroid11: ConfigPlugin = config => {
+  return withAndroidManifest(config, async config => {
+    let androidManifest = config.modResults.manifest
+    // @ts-ignore
+    let queries = androidManifest["queries"] || []
+    queries.push(androidVoiceRecognitionIntent)
+    // @ts-ignore
+    androidManifest["queries"] = queries
+    return config
+  })
+}
+
 const withVoice: ConfigPlugin<Props | void> = (config, props = {}) => {
   const _props = props ? props : {};
   config = withIosPermissions(config, _props);
   if (_props.microphonePermission !== false) {
     config = withAndroidPermissions(config);
   }
+  config = withAndroidManifestFixForAndroid11(config)
   return config;
 };
 
